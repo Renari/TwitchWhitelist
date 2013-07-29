@@ -76,9 +76,9 @@ else{
 	$user = new sub($client_id, $client_secret, $url, $_REQUEST['code'], $channel);
 
 	if (isset($_POST['username']) && $user->subbed) {
-		if (!file_exists('whitelist.txt'))
-			file_put_contents('whitelist.txt', '');
-		$list = file('whitelist.txt');
+		if (!file_exists('users.txt'))
+			file_put_contents('users.txt', '');
+		$list = file('users.txt');
 		//if they already have a username on the list, remove it
 		if (is_array($list)) {
 			for ($i=0; $i < count($list); $i++) {
@@ -91,13 +91,20 @@ else{
 
 			var_dump($list);
 			//output whitelist file
-			$fp = fopen('whitelist.txt', 'w+');
+			$fp = fopen('users.txt', 'w+');
+			$wl = fopen('whitelist.txt', 'w+')
 			foreach ($list as $line) {
 				fwrite($fp, trim($line).PHP_EOL);
+
+				$name = explode(' ', $line);
+				fwrite($wl, strtolower(trim($name[1])).PHP_EOL);
 			}
 			echo "$_POST[username] has been added to the whitelist.";
 		}
 		fwrite($fp, $user->userinfo->name." $_POST[username]");
+		fwrite($wl, strtolower($_POST['username']));
+		fclose($fp);
+		fclose($wl);
 	}
 	else if ($user->subbed) {
 		echo "<form method='post'> ".
